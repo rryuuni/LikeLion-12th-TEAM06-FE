@@ -28,7 +28,6 @@ const MainContainer = styled.div`
   box-sizing: border-box;
   background-color: #fdfdfd;
   margin: 0 auto;
-  position: fixed;
   z-index: 1;
 `;
 
