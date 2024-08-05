@@ -3,17 +3,23 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import plantsData from "../common/api/plantsApi.json";
+import { getPlantGuides } from "../api";
 
 function GuidePage() {
-  const [plants, setPlants] = useState({});
+  const [plants, setPlants] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setPlants(plantsData);
-    // fetch("./common/api/plantsApi.json")
-    //   .then((response) => response.json())
-    //   .then((data) => setPlants(data));
+    const fetchPlants = async () => {
+      try {
+        const response = await getPlantGuides();
+        setPlants(response.data);
+      } catch (error) {
+        console.error("식물 도감 데이터를 가져오는 데 실패했습니다:", error);
+      }
+    };
+
+    fetchPlants();
   }, []);
 
   return (
@@ -21,13 +27,13 @@ function GuidePage() {
       <Header />
       <Title>Plant List</Title>
       <Container>
-        {Object.keys(plants).length > 0 ? (
-          Object.keys(plants).map((key) => (
-            <GroupDetails key={plants[key].id}>
-              <PlantImage src={plants[key].img} alt={plants[key].nickname} />
+        {plants.length > 0 ? (
+          plants.map((plant) => (
+            <GroupDetails key={plant.id}>
+              <PlantImage src={plant.img} alt={plant.nickname} />
               <PlantText>
-                <PlantTitle>{plants[key].nickname}</PlantTitle>
-                <PlantDescription>{plants[key].descrption}</PlantDescription>
+                <PlantTitle>{plant.nickname}</PlantTitle>
+                <PlantDescription>{plant.description}</PlantDescription>
               </PlantText>
             </GroupDetails>
           ))
@@ -35,7 +41,9 @@ function GuidePage() {
           <NoData>식물을 추가해주세요.</NoData>
         )}
       </Container>
-      <AddBtn onClick={() => navigate("/guide/add")}> + </AddBtn>
+      <AddBtnContainer>
+        <AddBtn onClick={() => navigate("/guide/add")}> + </AddBtn>
+      </AddBtnContainer>
       <Footer />
     </MainContainer>
   );
@@ -63,6 +71,7 @@ const Container = styled.div`
   align-items: center;
   padding: 1rem;
   padding-bottom: 60px;
+  overflow-y: auto;
 `;
 
 const Title = styled.h1`
@@ -115,13 +124,19 @@ const NoData = styled.div`
   color: #ff0000;
 `;
 
+const AddBtnContainer = styled.div`
+  position: absolute;
+  bottom: 100px; /* Footer 위에 고정 */
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 15px; /* 버튼이 오른쪽 끝에 붙지 않도록 여유 공간 */
+`;
+
 const AddBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  position: sticky;
-  bottom: 100px;
-  align-self: flex-end;
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -130,5 +145,4 @@ const AddBtn = styled.button`
   background-color: rgba(2, 93, 0, 0.6);
   color: white;
   cursor: pointer;
-  margin-right: 15px;
 `;

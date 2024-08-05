@@ -1,8 +1,9 @@
-// src/pages/AddPlantPage.js
+// src/pages/GuidAddPage.js
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Footer from "../components/Footer";
+import { createPlant } from "../api"; // createPlant 함수 import
 
 function GuidAddPage() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function GuidAddPage() {
     }
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     if (
       !nickname.trim() ||
       !shortDescription.trim() ||
@@ -28,19 +29,19 @@ function GuidAddPage() {
       setUrlError(true);
     } else {
       setUrlError(false);
-      // Here you would typically send the data to your server or API
       const newPlant = {
-        id: Date.now(), // Simple ID generator based on timestamp
         nickname,
         img: selectedImage,
         shortDescription,
         description,
       };
 
-      console.log("New Plant Data:", newPlant);
-
-      // Navigate back to the guide page
-      navigate("/guide");
+      try {
+        await createPlant(newPlant); // 서버에 새로운 식물 정보 전송
+        navigate("/guide"); // Navigate back to the guide page
+      } catch (error) {
+        console.error("Failed to save new plant data:", error);
+      }
     }
   };
 
@@ -49,7 +50,6 @@ function GuidAddPage() {
       <HeaderSt>
         <Title>식물 정보</Title>
         <CancelBtn onClick={() => navigate("/guide")}>←</CancelBtn>
-
         <ImgContainer>
           식물사진:
           <ImageUpload>

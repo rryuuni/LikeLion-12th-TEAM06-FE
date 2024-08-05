@@ -11,7 +11,9 @@ ${reset}
 body {
 	font-family: apple-system, 'Open Sans', sans-serif;
 }
-
+body::-webkit-scrollbar {
+    display: none;
+}
 ol, ul {
 	list-style: none;
 }
