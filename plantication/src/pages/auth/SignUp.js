@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [password, setPassword] = useState("");
@@ -8,8 +9,25 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [inputValue, setInputValue] = useState("");
-  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [repassword, setRepassword] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [repsError, setRepsError] = useState("");
+  const navigate = useNavigate();
+
+  const [profileImage, setProfileImage] = useState(
+    "path/to/default/profile/image.jpg"
+  );
+  const [profilePreview, setProfilePreview] = useState(null);
+
+  const handleProfileEdit = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      setProfilePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handlePasswordChange = (event) => {
     const { value } = event.target;
     setPassword(value);
@@ -21,6 +39,17 @@ function SignUp() {
       );
     } else {
       setPasswordError("");
+    }
+  };
+
+  const handleRepasswordChange = (event) => {
+    const { value } = event.target;
+    setRepassword(value);
+
+    if (value !== password) {
+      setRepsError("비밀번호가 일치하지 않습니다.");
+    } else {
+      setRepsError("");
     }
   };
 
@@ -58,84 +87,106 @@ function SignUp() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    const userData = {
-      name,
-      username,
-      password,
-      email,
-      phone: inputValue.replace(/-/g, ""),
-    };
+
+    if (password !== repassword) {
+      setRepsError("비밀번호가 일치하지 않습니다.");
+      return;
+    }
 
     try {
-      const response = await axios.post(
-        "https://localhost:3000/auth",
-        userData
-      );
-      console.log(response.data);
-      // 성공 처리
+      const response = await axios.post("https://localhost:3000/auth", {
+        email,
+        password,
+        repassword,
+        nickname,
+        profileImage,
+      });
+
+      const { accessToken, refreshToken } = response.data.data;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      alert("회원가입 완료!");
+      navigate("/auth/login");
     } catch (error) {
-      console.error(error);
-      // 실패 처리
+      if (error.response) {
+        console.log("error");
+      }
     }
   };
 
   return (
     <>
       <MainContainer>
-        <Header>회원가입하고 다양한 혜택을 누리세요!</Header>
-        <Form>
-          <Label>
-            이름(닉네임) *
-            <Input type="text" />
-          </Label>
-          <Label>
-            아이디 *
-            <Input type="text" />
-          </Label>
-          <Label>
-            비밀번호(8~16자리 영문, 숫자 조합) *
-            <Input
-              type="password"
-              value={password}
-              onChange={handlePasswordChange}
-            />
-            {passwordError && <Error>{passwordError}</Error>}
-          </Label>
-          <Label>
-            이메일
-            <Input
-              type="email"
-              value={email}
-              onChange={handleEmailChange}
-              placeholder="email@ddd.com"
-            />
-            {emailError && <Error>{emailError}</Error>}
-          </Label>
-          <Label>
-            휴대폰 번호 *
-            <PhoneContainer>
+        <BackStyle onClick={() => navigate("/auth")}>←</BackStyle>
+        <Container>
+          <Header>회원가입하고 다양한 혜택을 누리세요!</Header>
+          <ProfileImage
+            src={profilePreview || profileImage}
+            alt="Profile Preview"
+          />
+          <EditButton>
+            프로필 이미지
+            <input type="file" accept="image/*" onChange={handleProfileEdit} />
+          </EditButton>
+          <Form onSubmit={handleSignUp}>
+            <Label>
+              이름(닉네임) *
+              <Input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
+            </Label>
+            <Label>
+              아이디 *
+              <Input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </Label>
+            <Label>
+              비밀번호(8~16자리 영문, 숫자 조합) *
+              <Input
+                type="password"
+                value={password}
+                onChange={handlePasswordChange}
+              />
+              {passwordError && <Error>{passwordError}</Error>}
+            </Label>
+            <Label>
+              비밀번호 확인 *
+              <Input
+                type="password"
+                value={repassword}
+                onChange={handleRepasswordChange}
+              />
+              {repsError && <Error>{repsError}</Error>}
+            </Label>
+            <Label>
+              이메일
+              <Input
+                type="email"
+                value={email}
+                onChange={handleEmailChange}
+                placeholder="email@ddd.com"
+              />
+              {emailError && <Error>{emailError}</Error>}
+            </Label>
+            <Label>
+              휴대폰 번호 *
               <Input
                 type="text"
                 onChange={handleChange}
                 value={inputValue}
                 placeholder="010-0000-0000"
               />
-              <Button>인증번호</Button>
-            </PhoneContainer>
-          </Label>
-          <Label>
-            인증번호 입력 *
-            <PhoneContainer>
-              <Input type="text" />
-              <Button>확인</Button>
-              <Button>재전송</Button>
-            </PhoneContainer>
-          </Label>
-          <Agreement>
-            필수동의 항목 및 개인정보 수집 및 이용 동의(선택), 광고성 정보
-            수신(선택)에 모두 동의합니다.
-          </Agreement>
-        </Form>
+            </Label>
+            <Button type="submit">회원가입</Button>
+          </Form>
+        </Container>
       </MainContainer>
     </>
   );
@@ -147,13 +198,31 @@ const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   width: 100%;
   max-width: 390px;
   height: 100vh;
   box-sizing: border-box;
   background-color: #fdfdfd;
   margin: 0 auto;
+  padding: 20px;
+  position: relative;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+`;
+
+const BackStyle = styled.div`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
 `;
 
 const Header = styled.h1`
@@ -163,26 +232,23 @@ const Header = styled.h1`
 `;
 
 const Form = styled.form`
-  width: 95%;
+  width: 100%;
 `;
 
 const Label = styled.label`
   display: block;
   font-size: 14px;
   margin-bottom: 6px;
+  margin-top: 10px;
 `;
 
 const Input = styled.input`
-  width: 95%;
+  width: 100%;
   padding: 10px;
   margin-top: 5px;
   border: 1px solid #ccc;
   box-sizing: border-box;
-`;
-
-const PhoneContainer = styled.div`
-  width: 95%;
-  display: flex;
+  height: 35px;
 `;
 
 const Button = styled.button`
@@ -190,19 +256,10 @@ const Button = styled.button`
   background-color: #0a5308;
   color: #fff;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   text-align: center;
+  height: 35px;
   width: 100px;
-`;
-
-const Agreement = styled.div`
-  border: 1px solid #bababa;
-  padding: 1.3rem;
-  margin-top: 30px;
-  font-size: 12px;
-  color: #555;
+  margin-top: 20px;
 `;
 
 const Error = styled.div`
@@ -210,4 +267,33 @@ const Error = styled.div`
   font-size: 12px;
   margin-top: 5px;
   margin-bottom: 4px;
+`;
+
+const ProfileImage = styled.img`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+`;
+
+const EditButton = styled.label`
+  display: inline-block;
+  padding: 10px;
+  font-size: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: #0a5308;
+  color: white;
+  cursor: pointer;
+  position: relative;
+
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
 `;

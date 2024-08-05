@@ -124,7 +124,7 @@ const Button = styled.button`
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 100%;
+  width: 95%;
   padding: 10px;
   margin-top: 20px;
 `;
