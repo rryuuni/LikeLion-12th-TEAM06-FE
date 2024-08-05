@@ -1,6 +1,11 @@
+/*Footer*/
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { IoAddCircleOutline } from "react-icons/io5";
+import { GrGroup } from "react-icons/gr";
+import { LuBookMarked } from "react-icons/lu";
+import { FiUser } from "react-icons/fi";
 
 function Footer() {
   return (
@@ -8,11 +13,15 @@ function Footer() {
       <MainContainer>
         <FooterContent>
           <FooterLink to="/diary">
-            <FooterIcon src="/assets/img/add.png" />
+            <FooterIcon>
+              <IoAddCircleOutline />
+            </FooterIcon>
             익명일기
           </FooterLink>
           <FooterLink to="/cooperate">
-            <FooterIcon src="/assets/img/globe.png" />
+            <FooterIcon>
+              <GrGroup />
+            </FooterIcon>
             그룹찾기
           </FooterLink>
           <HomeLink to="/">
@@ -20,11 +29,15 @@ function Footer() {
             Home
           </HomeLink>
           <FooterLink to="/guide">
-            <FooterIcon src="/assets/img/book.png" />
+            <FooterIcon>
+              <LuBookMarked />
+            </FooterIcon>
             식물도감
           </FooterLink>
           <FooterLink to="/mypage">
-            <FooterIcon src="/assets/img/user.png" />
+            <FooterIcon>
+              <FiUser />
+            </FooterIcon>
             마이페이지
           </FooterLink>
         </FooterContent>
@@ -40,7 +53,7 @@ const MainContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: auto;
+  height: 83px;
   width: 100%;
   max-width: 390px;
   box-sizing: border-box;
@@ -72,10 +85,18 @@ const FooterLink = styled(Link)`
   font-weight: 500;
 `;
 
-const FooterIcon = styled.img`
+const FooterIcon = styled.div`
   width: 26px;
   height: 26px;
   margin-bottom: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const HomeLink = styled(Link)`
