@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FaArrowLeft } from "react-icons/fa";
 import { BsSend } from "react-icons/bs";
+import { FaBook } from "react-icons/fa";
+import postsData from "../../common/api/diaryApi.json";
 
 function GroupChat() {
   const { groupId } = useParams();
@@ -10,12 +12,20 @@ function GroupChat() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [group, setGroup] = useState("");
+  const [showDiaryModal, setShowDiaryModal] = useState(false);
+  const [diaries, setDiaries] = useState([]);
 
   useEffect(() => {
     const storedGroups = JSON.parse(localStorage.getItem("joinedGroups")) || [];
-    const currentGroup = storedGroups[groupId];
+    const currentGroup = storedGroups.find(
+      (group) => group.groupId === groupId
+    );
     setGroup(currentGroup);
   }, [groupId]);
+
+  useEffect(() => {
+    setDiaries(postsData.posts);
+  }, []);
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
@@ -24,6 +34,14 @@ function GroupChat() {
       { text: newMessage, sender: "You", type: "text" },
     ]);
     setNewMessage("");
+  };
+
+  const handleSendDiary = (diary) => {
+    setMessages([
+      ...messages,
+      { text: diary.content, sender: diary.user, type: "text" },
+    ]);
+    setShowDiaryModal(false);
   };
 
   return (
@@ -35,7 +53,7 @@ function GroupChat() {
         {group && (
           <>
             <HeaderText>{group.title}</HeaderText>
-            <Participants>{group.number}</Participants>
+            <Participants>{group.people}</Participants>
           </>
         )}
       </ChatHeader>
@@ -58,6 +76,9 @@ function GroupChat() {
         ))}
       </MessagesContainer>
       <MessageInputContainer>
+        <SendButton onClick={() => setShowDiaryModal(true)}>
+          <FaBook />
+        </SendButton>
         <MessageInput
           type="text"
           value={newMessage}
@@ -68,6 +89,29 @@ function GroupChat() {
           <BsSend />
         </SendButton>
       </MessageInputContainer>
+      {showDiaryModal && (
+        <DiaryModal>
+          <DiaryModalContent>
+            <ModalHeader>
+              <ModalTitle>일기 선택</ModalTitle>
+              <CloseButton onClick={() => setShowDiaryModal(false)}>
+                X
+              </CloseButton>
+            </ModalHeader>
+            <DiaryList>
+              {diaries.map((diary) => (
+                <DiaryItem
+                  key={diary.id}
+                  onClick={() => handleSendDiary(diary)}
+                >
+                  <DiaryTitle>{diary.user}</DiaryTitle>
+                  <DiaryDate>{diary.date}</DiaryDate>
+                </DiaryItem>
+              ))}
+            </DiaryList>
+          </DiaryModalContent>
+        </DiaryModal>
+      )}
     </MainContainer>
   );
 }
@@ -178,4 +222,64 @@ const SendButton = styled.button`
   &:hover {
     background-color: #45a049;
   }
+`;
+
+const DiaryModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+`;
+
+const DiaryModalContent = styled.div`
+  background-color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ModalTitle = styled.h2`
+  margin: 0;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+`;
+
+const DiaryList = styled.div`
+  margin-top: 1rem;
+`;
+
+const DiaryItem = styled.div`
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f1f1f1;
+  }
+`;
+
+const DiaryTitle = styled.div`
+  font-weight: bold;
+`;
+
+const DiaryDate = styled.div`
+  color: #888;
 `;
