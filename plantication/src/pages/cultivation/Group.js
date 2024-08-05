@@ -3,6 +3,7 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import axios from "axios";
 
 function Group() {
   const navigate = useNavigate();
@@ -12,8 +13,15 @@ function Group() {
   const [tooltipIndex, setTooltipIndex] = useState(null);
 
   useEffect(() => {
-    const storedGroups = JSON.parse(localStorage.getItem("groups")) || [];
-    setGroups(storedGroups);
+    // 백엔드에서 데이터 가져오기
+    axios
+      .get("https://localhost:3000/cooperate")
+      .then((response) => {
+        setGroups(response.data); // 서버에서 받은 데이터를 상태에 저장
+      })
+      .catch((error) => {
+        console.error("데이터를 가져오는 중 오류가 발생했습니다:", error);
+      });
   }, []);
 
   const handleJoinClick = (index) => {

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import styled from "styled-components";
 import Footer from "../../components/Footer";
+import axios from "axios";
 
 function GroupCreate() {
   const navigate = useNavigate();
@@ -12,21 +13,36 @@ function GroupCreate() {
   const [content, setContent] = useState("");
   const [publicStatus, setPublicStatus] = useState("yes");
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault();
+
     const newEntry = {
-      image,
       title,
-      number,
-      hashtag,
+      openStatus: publicStatus === "yes",
+      image,
+      people: parseInt(number),
       content,
-      publicStatus,
-      isJoined: false,
+      createdAt: new Date().toISOString(),
     };
-    const storedGroups = JSON.parse(localStorage.getItem("groups")) || [];
-    storedGroups.push(newEntry);
-    localStorage.setItem("groups", JSON.stringify(storedGroups));
-    navigate("/cooperate");
+
+    try {
+      const response = await axios.post(
+        "https://localhost:3000/cooperate",
+        newEntry
+      );
+      const { accessToken, refreshToken } = response.data.data;
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      if (response.status === 200) {
+        alert("그룹이 성공적으로 생성되었습니다!");
+        navigate("/cooperate");
+      }
+    } catch (error) {
+      console.error("그룹 생성 오류:", error);
+      alert("그룹 생성 중 오류가 발생했습니다.");
+    }
   };
 
   const handelImageUpload = (event) => {
@@ -91,7 +107,6 @@ function GroupCreate() {
               type="number"
               min={1}
               max={100}
-              defaultValue={1}
               value={number}
               onChange={(e) => setNumber(e.target.value)}
             />
