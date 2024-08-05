@@ -26,13 +26,14 @@ function Login() {
                 <img src="./assets/img/user.png" />
                 회원가입 하기
               </BtnStyle>
+
+              <LoginSt>
+                이미 계정이 있으신가요?{" "}
+                <LoginBtn onClick={() => navigate("/auth/Login")}>
+                  로그인
+                </LoginBtn>
+              </LoginSt>
             </ButtonGroup>
-            <LoginSt>
-              이미 계정이 있으신가요?{" "}
-              <LoginBtn onClick={() => navigate("/auth/Login")}>
-                로그인
-              </LoginBtn>
-            </LoginSt>
           </LoginStyle>
         </CoverStyle>
       </MainContainer>
@@ -49,6 +50,7 @@ const MainContainer = styled.div`
   height: 100vh;
   background-color: #fdfdfd;
   margin: 0 auto;
+  position: relative;
 `;
 
 const CoverStyle = styled.div`
@@ -73,8 +75,9 @@ const TestSt = styled.div`
 `;
 
 const ButtonGroup = styled.div`
-  margin-top: 300px;
-  width: 100%;
+  position: absolute;
+  bottom: 100px;
+  width: 80%;
 `;
 
 const BtnStyle = styled.button`
@@ -117,7 +120,7 @@ const LogoStyle = styled.div`
 `;
 
 const LoginSt = styled.div`
-  margin-top: 10px;
+  margin-top: 20px;
 `;
 
 const LoginBtn = styled.span`

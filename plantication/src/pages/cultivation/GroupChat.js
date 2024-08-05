@@ -60,10 +60,7 @@ function GroupChat() {
       <MessagesContainer>
         {messages.map((message, index) => (
           <Message key={index}>
-            <UserAvatar
-              src="https://via.placeholder.com/40"
-              alt="User Avatar"
-            />
+            <UserAvatar src="/assets/img/user.png" alt="User Avatar" />
             <MessageContent>
               <MessageSender>{message.sender}</MessageSender>
               {message.type === "text" ? (
@@ -134,7 +131,7 @@ const ChatHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background-color: #4caf50;
+  background-color: #0a5308;
   color: white;
 `;
 
@@ -206,16 +203,14 @@ const MessageInput = styled.input`
   flex: 1;
   padding: 0.5rem;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 40px;
   margin-right: 0.5rem;
 `;
 
 const SendButton = styled.button`
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   border: none;
   border-radius: 5px;
-  background-color: #4caf50;
-  color: white;
   cursor: pointer;
   font-size: 1.5rem;
 
