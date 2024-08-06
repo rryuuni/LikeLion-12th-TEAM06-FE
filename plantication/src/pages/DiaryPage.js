@@ -70,6 +70,7 @@ const PostsContainer = styled.div`
   width: 100%;
   padding: 0 20px;
   box-sizing: border-box;
+  padding-bottom: 83px;
 `;
 
 const PostCard = styled.div`
@@ -118,7 +119,7 @@ const AddBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  position: sticky;
+  position: fixed;
   bottom: 100px;
   align-self: flex-end;
   border: none;

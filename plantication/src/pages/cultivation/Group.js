@@ -58,7 +58,7 @@ function Group() {
         <Header />
         <Title>공동 재배</Title>
         <ChatIcon
-          src="./assets/img/chat.png"
+          src="/assets/img/chat.png"
           onClick={() => navigate("/cooperate/my")}
         />
 
