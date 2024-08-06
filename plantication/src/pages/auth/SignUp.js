@@ -94,7 +94,7 @@ function SignUp() {
     }
 
     try {
-      const response = await axios.post("https://localhost:3000/auth", {
+      const response = await axios.post("https://plantication.site/auth", {
         email,
         password,
         repassword,
